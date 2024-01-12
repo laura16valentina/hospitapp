@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="citas.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js""></script>
+    <title>admin - HospitApp</title>
+  </head>
+
+  <body>
+    <div class="tabla-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Especialidad</th>
+            <th>Fecha de asignacion</th>
+          </tr>
+        </thead>
+        <tbody class="tablacitas">
+
+        </tbody>
+      </table>
+    </div>
+  </body>
+
+  <script>
+    let usersData = [];
+    window.onload = functiongetmicitas;
+
+    function functiongetmicitas() {
+      let user = JSON.parse(localStorage.getItem('user'));
+      fetch("http://localhost:3000/api/obtenermiscitas/" + user.email, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          let html = "";
+
+          for (let index = 0; index < data.citas.length; index++) {
+            const element = data.citas[index];
+            html += `<tr>`;
+            html += `<td>${element.nombre}</td>`;
+            html += `<td>${element.email}</td>`;
+            html += `<td>${element.especialidad}</td>`;
+            html += `<td>${moment(element.fecha).format('DD/MM/YYYY hh:mm A')}</td>`;
+            html += `<tr>`;
+          }
+          document.querySelector(".tablacitas").innerHTML = html;
+        })
+        .catch((error) => {
+          console.log(error);
+          alert("Error en la solicitud");
+        });
+    }
+  </script>
+</html>

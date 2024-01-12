@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="login.css" />
+    <title>Login - HospitApp</title>
+  </head>
+  <body>
+    <div class="login-container">
+      <h2>Login</h2>
+      <form>
+        <label for="username">Usuario:</label>
+        <input type="text" id="username" name="username" required />
+
+        <label for="password">Contraseña:</label>
+        <input type="password" id="password" name="password" required />
+
+        <button type="button" onclick="login()">Iniciar sesión</button>
+      </form>
+    </div>
+  </body>
+  <script>
+    function login() {
+      let username = document.querySelector("#username").value;
+      let password = document.querySelector("#password").value;
+      if (username.trim() === "") {
+        alert("El campo usuario esta vació");
+        return;
+      }
+      if (password.trim() === "") {
+        alert("El campo contraseña esta vació");
+        return;
+      }
+
+      let body = {
+        email: username,
+        password: password,
+      };
+
+      fecthLogin(body);
+    }
+
+    function fecthLogin(body) {
+      fetch(`http://localhost:3000/api/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.ok === false) {
+            alert(data.error);
+          } else {
+            localStorage.setItem("login", true);
+            let user = JSON.stringify(data.success);
+            localStorage.setItem("user", user);
+            window.parent.postMessage('recargarPagina', '*');
+          }
+          console.log(data);
+          console.log(data);
+        })
+        .catch((error) => {
+            console.log(error);
+          alert("Error en la solicitud");
+        });
+    }
+  </script>
+</html>

@@ -1,0 +1,33 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+header {
+  background-color: #4caf50;
+  color: black;
+  padding: 8px;
+  text-align: center;
+}
+
+nav {
+  display: flex;
+  justify-content: space-around;
+  background-color: #6a9f6b;
+  padding: 8px;
+}
+
+nav a {
+  text-decoration: none;
+  color: black;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.contenido {
+  overflow: hidden;
+  width: 100%;
+  height: calc(100vh - 155px);
+}

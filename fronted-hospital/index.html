@@ -1,0 +1,92 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>HospitApp</title>
+  </head>
+  <body>
+    <div id="contenedorIframe"></div>
+  </body>
+  <script>
+    window.onload = crearAdmin;
+
+    function funcionInicial() {
+      let user = localStorage.getItem("user");
+      let isLogin = localStorage.getItem("login") ? true : false;
+      if (isLogin === false) {
+        renderizarIframeLogin();
+        return;
+      }
+      let userObjet = JSON.parse(user);
+      if (userObjet.tipoUser === "personal") {
+        renderizarIframeadmin();
+      }
+      if (userObjet.tipoUser === "paciente") {
+        renderizarIframeuser();
+      }
+    }
+
+    function renderizarIframeLogin() {
+      let html = "src/views/login/login.html";
+      let iframe = document.createElement("iframe");
+      iframe.width = "100%";
+      iframe.height = "100%";
+      iframe.src = html;
+      let contenedor = document.querySelector("#contenedorIframe");
+      contenedor.appendChild(iframe);
+    }
+
+    function renderizarIframeuser() {
+      let html = "src/views/homeUser/homeUser.html";
+      let iframe = document.createElement("iframe");
+      iframe.width = "100%";
+      iframe.height = "100%";
+      iframe.src = html;
+      let contenedor = document.querySelector("#contenedorIframe");
+      contenedor.appendChild(iframe);
+    }
+
+    function renderizarIframeadmin() {
+      let html = "src/views/homeAdmin/homeAdmin.html";
+      let iframe = document.createElement("iframe");
+      iframe.width = "100%";
+      iframe.height = "100%";
+      iframe.src = html;
+      let contenedor = document.querySelector("#contenedorIframe");
+      contenedor.appendChild(iframe);
+    }
+
+    window.addEventListener("message", function (event) {
+      if (event.data === "recargarPagina") {
+        location.reload();
+      }
+    });
+
+    function crearAdmin() {
+      let body = {
+        name: 'Usuario administrador',
+        email: 'admin@gmail.com',
+        password: '123456',
+        tipoUser: 'personal',
+      };
+      fetch(`http://localhost:3000/api/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          funcionInicial();
+        })
+        .catch((error) => {
+          console.log(error);
+          alert("Error en la solicitud");
+        });
+    }
+  </script>
+</html>

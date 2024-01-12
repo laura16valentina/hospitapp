@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="homeUser.css" />
+    <title>user - HospitApp</title>
+  </head>
+  <body>
+    <header>
+      <h1>HospitApp</h1>
+    </header>
+    <nav>
+      <a href="#" onclick="cargarContenido('pages/inicio/inicio.html')"
+        >Inicio</a
+      >
+      <a href="#" onclick="cargarContenido('pages/citas/citas.html')"
+        >Mis citas</a
+      >
+      <a href="#" onclick="cargarContenido('pages/novedades/novedades.html')"
+        >Mis novedades</a
+      >
+      <a href="#" onclick="logout()">Cerrar sesión</a>
+    </nav>
+
+    <div id="contenido" class="contenido"></div>
+  </body>
+  <script>
+    window.onload = cargarContenido('pages/inicio/inicio.html');
+    function logout() {
+      localStorage.removeItem("login");
+      localStorage.removeItem("user");
+      window.parent.postMessage("recargarPagina", "*");
+    }
+
+    function cargarContenido(url) {
+      let iframe = document.createElement("iframe");
+      iframe.width = "100%";
+      iframe.height = "100%";
+      iframe.src = url;
+      let contenedor = document.querySelector("#contenido");
+      contenedor.innerHTML = "";
+      contenedor.appendChild(iframe);
+    }
+  </script>
+</html>

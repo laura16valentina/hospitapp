@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="inicio.css" />
+    <title>admin - HospitApp</title>
+  </head>
+  <body>
+    <div class="tarjeta">
+      <h2 class="title">Bienvenido</h2>
+    </div>
+  </body>
+  <script>
+    window.onload = functioninicial;
+    function functioninicial() {
+      let user = JSON.parse(localStorage.getItem("user"));
+      document.querySelector(".title").innerHTML = "Bienvenid@ " + user.name;
+    }
+  </script>
+</html>

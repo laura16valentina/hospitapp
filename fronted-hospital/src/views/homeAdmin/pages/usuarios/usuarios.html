@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="usuarios.css" />
+    <title>admin - HospitApp</title>
+  </head>
+  <body>
+    <button class="crear-btn" onclick="abrirModal()">Crear Usuario</button>
+    <div class="tabla-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Correo Electrónico</th>
+            <th>Tipo de usuario</th>
+          </tr>
+        </thead>
+        <tbody class="tablaUser"></tbody>
+      </table>
+    </div>
+
+    <div id="miModal" class="modal">
+      <div class="modal-content">
+        <form>
+          <label for="username">Nombre de usuario:</label>
+          <input type="text" id="username" name="username" required />
+
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" required />
+
+          <label for="password">Tipo de usuario:</label>
+          <select id="opciones">
+            <option value="paciente">Paciente</option>
+            <option value="personal">Personal</option>
+          </select>
+
+          <label for="password">Contraseña:</label>
+          <input type="password" id="password" name="password" required />
+
+          <div>
+            <button type="button" onclick="crearuser()">Crear usuario</button>
+            <button onclick="cerrarModal()">Cerrar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+
+  <script>
+    window.onload = functioninicial;
+    function functioninicial() {
+      fetch(`http://localhost:3000/api/user`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          let html = "";
+          for (let index = 0; index < data.user.length; index++) {
+            const element = data.user[index];
+            html += `<tr>`;
+            html += `<td>${element.name}</td>`;
+            html += `<td>${element.email}</td>`;
+            html += `<td>${element.tipoUser}</td>`;
+            html += `<tr>`;
+          }
+          document.querySelector(".tablaUser").innerHTML = html;
+        })
+        .catch((error) => {
+          console.log(error);
+          alert("Error en la solicitud");
+        });
+    }
+
+    function abrirModal() {
+      document.getElementById("miModal").style.display = "flex";
+    }
+
+    function cerrarModal() {
+      document.getElementById("miModal").style.display = "none";
+    }
+
+    function crearuser() {
+      let username = document.querySelector("#username").value;
+      let email = document.querySelector("#email").value;
+      let password = document.querySelector("#password").value;
+      let tipouser = document.querySelector("#opciones").value;
+
+      if (username.trim() === "") {
+        alert("El campo usuario esta vació");
+        return;
+      }
+      if (password.trim() === "") {
+        alert("El campo contraseña esta vació");
+        return;
+      }
+
+      if (email.trim() === "") {
+        alert("El campo email esta vació");
+        return;
+      }
+
+      if (tipouser.trim() === "") {
+        alert("El campo tipo de usuario esta vació");
+        return;
+      }
+
+      let body = {
+        name: username,
+        email: email,
+        password: password,
+        tipoUser: tipouser,
+      };
+
+      fetch(`http://localhost:3000/api/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.ok === false) {
+            alert(data.error);
+          } else {
+            cerrarModal();
+            document.querySelector("#username").value = "";
+            document.querySelector("#email").value = "";
+            document.querySelector("#password").value = "";
+            functioninicial();
+            alert(data.success);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          alert("Error en la solicitud");
+        });
+    }
+  </script>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="citas.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js""></script>
+    <title>admin - HospitApp</title>
+  </head>
+
+  <body>
+    <button class="crear-btn" onclick="abrirModal()">Crear cita</button>
+    <div class="tabla-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre del paciente</th>
+            <th>Email del paciente</th>
+            <th>Especialidad</th>
+            <th>Fecha de asignacion</th>
+          </tr>
+        </thead>
+        <tbody class="tablacitas"></tbody>
+      </table>
+    </div>
+
+    <div id="miModal" class="modal">
+      <div class="modal-content">
+        <form>
+          <label for="user">Usuario:</label>
+          <select id="opcionesuser"></select>
+
+          <label for="fecha">Fecha:</label>
+          <input type="datetime-local" id="fecha" name="fecha" required />
+
+          <label for="especialidad">Especialidad:</label>
+          <textarea id="especialidad" name="especialidad"></textarea>
+
+          <div>
+            <button type="button" onclick="crearcita()">Crear cita</button>
+            <button onclick="cerrarModal()">Cerrar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+
+  <script>
+    let usersData = [];
+    window.onload = functioninicial;
+
+    function functioninicial() {
+      functiongetcitas();
+      functiongetusers();
+    }
+
+    function functiongetcitas() {
+      fetch(`http://localhost:3000/api/obtenercitas`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          let html = "";
+
+          for (let index = 0; index < data.citas.length; index++) {
+            const element = data.citas[index];
+            html += `<tr>`;
+            html += `<td>${element.nombre}</td>`;
+            html += `<td>${element.email}</td>`;
+            html += `<td>${element.especialidad}</td>`;
+            html += `<td>${moment(element.fecha).format('DD/MM/YYYY hh:mm A')}</td>`;
+            html += `<tr>`;
+          }
+          document.querySelector(".tablacitas").innerHTML = html;
+        })
+        .catch((error) => {
+          console.log(error);
+          alert("Error en la solicitud");
+        });
+    }
+
+    function functiongetusers() {
+      fetch(`http://localhost:3000/api/user`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          usersData = data.user;
+          let html = '<option value="0">Seleccionar usuario</option>';
+          for (let index = 0; index < data.user.length; index++) {
+            const element = data.user[index];
+            html += `<option value="${element.email}">${element.name}</option>`;
+          }
+          document.querySelector("#opcionesuser").innerHTML = html;
+        })
+        .catch((error) => {
+          console.log(error);
+          alert("Error en la solicitud");
+        });
+    }
+
+    function abrirModal() {
+      document.getElementById("miModal").style.display = "flex";
+    }
+
+    function cerrarModal() {
+      document.getElementById("miModal").style.display = "none";
+    }
+
+    function crearcita() {
+      let opcionesuser = document.querySelector("#opcionesuser").value;
+      let fecha = document.querySelector("#fecha").value;
+      let especialidad = document.querySelector("#especialidad").value;
+
+      if (opcionesuser.trim() === "0") {
+        alert("Falta seleccionar un usuario");
+        return;
+      }
+      if (fecha.trim() === "") {
+        alert("El campo fecha esta vació");
+        return;
+      }
+
+      if (especialidad.trim() === "") {
+        alert("El campo especialidad  esta vació");
+        return;
+      }
+
+      let userSeleccionado = usersData.find(
+        (item) => item.email === opcionesuser
+      );
+
+      let body = {
+        nombre: userSeleccionado.name,
+        email: opcionesuser,
+        especialidad: especialidad,
+        fecha: fecha,
+      };
+
+      fetch(`http://localhost:3000/api/citas`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          cerrarModal();
+          document.querySelector("#opcionesuser").value = "0";
+          document.querySelector("#fecha").value = "";
+          document.querySelector("#especialidad").value = "";
+          functiongetcitas();
+          alert(data.success);
+        })
+        .catch((error) => {
+          console.log(error);
+          alert("Error en la solicitud");
+        });
+    }
+  </script>
+</html>
